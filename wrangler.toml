@@ -1,0 +1,4 @@
+kv_namespaces = [
+  { binding = "USERS", id = "9621ab90ad4a42f185de93d1d213270a" },
+  { binding = "FILES", id = "b74d4f69ad6d47ad9d81c911ac876178" }
+]

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <div id="user"></div>
+  <button id="logout">Logout</button>
+  <h2>Your Files</h2>
+  <ul id="files"></ul>
+  <h2>Create / Edit File</h2>
+  <form id="fileForm">
+    <input type="text" id="path" placeholder="path/to/file.txt" required><br/>
+    <textarea id="content" rows="10" cols="50" placeholder="file content"></textarea><br/>
+    <button type="submit">Save</button>
+  </form>
+  <script>
+    const auth     = localStorage.getItem('auth');
+    const username = localStorage.getItem('username');
+    if (!auth || !username) window.location.href = '/login.html';
+
+    document.getElementById('user').textContent = 'Logged in as ' + username;
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('auth');
+      localStorage.removeItem('username');
+      window.location.href = '/';
+    });
+
+    async function loadFiles() {
+      const res = await fetch('/api/files', {
+        headers: { 'Authorization': auth }
+      });
+      if (!res.ok) return;
+      const files = await res.json();
+      const list = document.getElementById('files');
+      list.innerHTML = '';
+      files.forEach(path => {
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+        link.href   = '/' + username + '/' + path;
+        link.textContent = path;
+        link.target = '_blank';
+        li.appendChild(link);
+
+        const del = document.createElement('button');
+        del.textContent = 'Delete';
+        del.addEventListener('click', async () => {
+          await fetch('/api/files', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type':'application/json',
+              'Authorization': auth
+            },
+            body: JSON.stringify({ path })
+          });
+          loadFiles();
+        });
+        li.appendChild(del);
+
+        li.addEventListener('click', async () => {
+          const res2 = await fetch('/' + username + '/' + path, {
+            headers: { 'Authorization': auth }
+          });
+          const text = await res2.text();
+          document.getElementById('path').value    = path;
+          document.getElementById('content').value = text;
+        });
+
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('fileForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const path    = document.getElementById('path').value.trim();
+      const content = document.getElementById('content').value;
+      await fetch('/api/files', {
+        method: 'POST',
+        headers: {
+          'Content-Type':'application/json',
+          'Authorization': auth
+        },
+        body: JSON.stringify({ path, content })
+      });
+      loadFiles();
+    });
+
+    loadFiles();
+  </script>
+</body>
+</html>

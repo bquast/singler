@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Register</title>
+</head>
+<body>
+  <h1>Register</h1>
+  <form id="regForm">
+    <input type="text" id="username" placeholder="Username" required><br/>
+    <input type="email" id="email" placeholder="Email" required><br/>
+    <input type="password" id="password" placeholder="Password" required><br/>
+    <button type="submit">Register</button>
+  </form>
+  <div id="msg"></div>
+  <script>
+    document.getElementById('regForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const res = await fetch('/register', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ username, email, password })
+      });
+      const data = await res.json();
+      const msg = document.getElementById('msg');
+      if (res.ok) {
+        msg.innerHTML = 'Check your email for verification link:<br/><a href="' 
+                       + data.verifyUrl + '">' + data.verifyUrl + '</a>';
+      } else {
+        msg.textContent = data.message || 'Error: ' + res.status;
+      }
+    });
+  </script>
+</body>
+</html>

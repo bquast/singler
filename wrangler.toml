@@ -1,11 +1,11 @@
 name                   = "singler"
-account_id             = "c3c8faa9e948021616316f48cdec254a"
+pages_build_output_dir = "."
 compatibility_date     = "2025-07-02"
 
-pages_build_output_dir = "."
-functions              = "functions"
+[[kv_namespaces]]
+binding = "USERS"
+id      = "9621ab90ad4a42f185de93d1d213270a"
 
-kv_namespaces = [
-  { binding = "USERS", id = "9621ab90ad4a42f185de93d1d213270a" },
-  { binding = "FILES", id = "b74d4f69ad6d47ad9d81c911ac876178" }
-]
+[[kv_namespaces]]
+binding = "FILES"
+id      = "b74d4f69ad6d47ad9d81c911ac876178"
